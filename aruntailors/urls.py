@@ -23,10 +23,10 @@ from aruntailors.x import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("employees",include("employees.urls")),
-    path('', root),
+    path("employees/",include("employees.urls")),
+    path('x', root),
     path("render_template", x),
     path("chaduvuko_first",rod),
     path("login",login),
-    path("home",HomePage)
+    path("",HomePage)
 ]

@@ -16,8 +16,4 @@ def login(request):
     return HttpResponseRedirect("home")
 
 def HomePage(request):
-    if not dictionary:
-        return HttpResponseRedirect("login")
-    else:
-        if dictionary:
-            return HttpResponse("THIs is the home page")
+    return HttpResponseRedirect("/employees")
