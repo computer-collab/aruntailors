@@ -5,4 +5,4 @@ from os import getcwd
 print(__file__,"   " , getcwd())
 # Create your views here.
 def rod (request):
-    return HttpResponseRedirect("/")
+    return HttpResponse("<h1>Chaduvuko first</h1>")

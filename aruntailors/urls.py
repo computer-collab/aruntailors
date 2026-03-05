@@ -19,11 +19,10 @@ from django.urls import path,include
 from aruntailors.x import root,x
 from employees.views import rod
 from aruntailors.x import *
-
+from admin import urls
 
 urlpatterns = [
-    path('admin', admin.site.urls),
-    # path("/admin/",include ("admin.urls"))
+    path("admin/",include(urls)),
     path("employees/",include("employees.urls")),
     path('x', root),
     path("render_template", x),
