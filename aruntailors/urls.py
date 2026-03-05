@@ -22,7 +22,8 @@ from aruntailors.x import *
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path('admin', admin.site.urls),
+    # path("/admin/",include ("admin.urls"))
     path("employees/",include("employees.urls")),
     path('x', root),
     path("render_template", x),
