@@ -7,7 +7,7 @@
 </head>
 <body>
     <form>
-        {% csrf_token %}
+        
         <input id = "UsernameBox" placeholder="Username" type="text">
         <input id = "PasswordBox" placeholder="Password" type="password">
         <a href="/forgot_details">Forgot your details??</a>
@@ -24,11 +24,12 @@
             const login_pack = {
                 username : username ,password : password , request_type : request_type
             }
-            
+            const token = "{{ csrf_token }}";
             fetch("login",{
                 method : "POST",
                 headers : {
-                    "content-type" : "application/json"
+                    "Content-Type":"application/json",
+                    "X-CSRFToken" : token
                 }, body : JSON.stringify(login_pack)
             }).then (res=>res.json()).then(server=>{
                 if (server.status=="ok"){

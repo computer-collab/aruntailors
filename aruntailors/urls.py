@@ -23,10 +23,5 @@ from admin import urls
 
 urlpatterns = [
     path("admin/",include(urls)),
-    path("employees/",include("employees.urls")),
-    path('x', root),
-    path("render_template", x),
-    path("chaduvuko_first",rod),
-    path("login",login),
-    path("",HomePage)
+    
 ]
