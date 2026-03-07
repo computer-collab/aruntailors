@@ -16,9 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
-from aruntailors.x import root,x
 from employees.views import rod
-from aruntailors.x import *
 from admin import urls
 
 urlpatterns = [
