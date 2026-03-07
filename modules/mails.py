@@ -5,7 +5,7 @@ import random, smtplib
 def GenerateOTP(**details):
     Name = details.get("name")
     receiver_email = details.get("email")
-    request_type = details.get("request_type")
+    request_type = details.get("request")
     if not receiver_email:
         raise Exception("No email address input found")
 

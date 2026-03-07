@@ -13,12 +13,17 @@
 <body>
     <forms >
         {% csrf_token %}
-        <div id="ForgotPassword" class="none">
-            <input placeholder="Enter Email Address" name="EmailBox" type="email" required>
-            <button id="GenerateOtp" type="button">GenerateOtp</button>"
-            <input placeholder="Enter the OTP" name = "OTPBox" type="password">
-            <button id="VerifyEmailAddress">Submit</button>
+        <div id="ForgotPassword" class="hidden">
+          <div id="EmailAddressDiv" class="hidden">  <input placeholder="Enter Email Address" name="EmailBox" type="email" required>
+            <br><button id="GenerateOtp" type="button">GenerateOtp</button></div>
 
+
+            <br>
+            <div id="OtpBoxDiv" class="hidden">
+            <input placeholder="Enter the OTP" name = "OTPBox" type="password">
+            <br>
+            <button id="VerifyEmailAddress">Submit</button>
+</div>
         </div>
         <div id="ChangePassword" class="hidden">
             <input placeholder="Enter Password" id="PasswordBox1">
@@ -27,47 +32,45 @@
         </div>
     </forms>
     <div id="MessageBox"></div>
+
+
+
+
+    <!---------------- Scripting   ------------------ -->
     <script >
         
+        const EmailAddressDiv = document.getElementById("EmailAddressDiv");
+        const OtpVerificationDiv = document.getElementById("OtpBoxDiv");
+        const ChangePasswordDiv = document.getElementById("ChangePassword");
+        const ForgotPasswordVerifyDiv = document.getElementById("ForgotPassword");
         const EmailBox = document.querySelector("[name=EmailBox]");
         const GenerateOtpButton = document.getElementById("GenerateOtp");
         const OtpBox = document.querySelector("[name=OTPBox]");
         const VerifyEmailAddressButton = document.querySelector("#VerifyEmailAddress");
         const MessageBox = document.getElementById("MessageBox");
         let request_type;
-       window.onload = function x(){ 
         
-        fetch("forgot_details",{
-            method : "POST",
-            headers : {
-                "content-type" : "application/json",
-                "X-CSRFToken" : document.querySelector("[name=csrfmiddlewaretoken]").value
-            }, body : JSON.stringify({request_type : "fetch_status"})
-        }).then(res => res.json()).then( server => {
-            if (server.status == "ok" && server.request_type == "email_verified"){
-                let x;
-            } else alert(server.message)
-        })
-
-        GenerateOtpButton.addEventListener("click", button=>{
-            button.preventDefault(); 
-            const details_pack = {
-                request_type : "generate_otp",
-                email : EmailBox.value
-            }
+        
+        window.onload = () =>{
             fetch("forgot_details",{
                 method : "POST",
                 headers : {
-                     "content-type" : "application/json",
-                    "X-CSRFToken" : document.querySelector("[name=csrfmiddlewaretoken]").value
-               }, body : JSON.stringify(details_pack)
-            }).then(res=>res.json()).then(server=>{
-                if (server.status == "ok"){
+                    "X-CSRFToken" : document.querySelector("[name=csrfmiddlewaretoken]").value,
+                    "Content-Type" : "application/json"
+                }, body : JSON.stringify ({ request_type : "setup"})
+            }).then (res => res.json()).then(server=>{
+                if (server.setup === "email_done"){
+                    EmailAddressDiv.classList.add("hidden")
+                    OtpVerificationDiv.classList.remove("hidden")
                     MessageBox.innerHTML = server.message
-                }
+                }else {
+                    EmailAddressDiv.classList.remove("hidden");
+                    ForgotPasswordVerifyDiv.classList.remove("hidden")
+                    
+                }  
             })
-        })
-    }
+        }
+
     </script>
-</body>
-</html>
+    </body>
+    </html>
