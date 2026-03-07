@@ -10,7 +10,7 @@
         {% csrf_token%}
         <input id = "UsernameBox" placeholder="Username" type="text">
         <input id = "PasswordBox" placeholder="Password" type="password">
-        <a href="/forgot_details">Forgot your details??</a>
+        <a href="forgot_details">Forgot your details??</a>
         <div id="message"></div>
         <button id="submit">Submit</button>
     </form>
@@ -24,12 +24,12 @@
             const login_pack = {
                 username : username ,password : password , request_type : request_type
             }
-            const token = document.querySelector("[name=csrfmiddlewaretoken]").value;
+            
             fetch("login",{
                 method : "POST",
                 headers : {
                     "Content-Type":"application/json",
-                    "X-CSRFToken" : token
+                    "X-CSRFToken" : document.querySelector("[name=csrfmiddlewaretoken]").value
                 }, body : JSON.stringify(login_pack)
             }).then (res=>res.json()).then(server=>{
                 if (server.status=="ok"){

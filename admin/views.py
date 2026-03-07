@@ -1,8 +1,10 @@
-from django.shortcuts import render
-from django.http import request,JsonResponse,HttpResponse
+from django.shortcuts import render,redirect
+from django.http import request,JsonResponse,HttpResponse,HttpResponseRedirect
 import json
 import modules
 from django.contrib.auth import login, logout, decorators,authenticate, models
+from django.contrib import sessions
+
 
 
 def AdminDashboard(request):
@@ -11,7 +13,7 @@ def AdminDashboard(request):
             return render(request,"admin/admin_dashboard.html")
            
         else:
-            return JsonResponse({"message" : "Please login"})
+            return HttpResponseRedirect("login")
 
 def AdminLogin(request):
     if request.method == "GET":
@@ -31,9 +33,18 @@ def AdminLogin(request):
 def AdminRegister(request): 
     pass
 
-def ForgotPassword(request):
+def AdminForgotDetails(request):
     if request.method == "GET":
-        return render(request,"admin/ForgotPassword.html")
+        return render(request,"admin/admin_forgot_details.html")
+    
+    elif request.method == "POST":
+        details_pack = json.loads(request.body)
+        request_type = details_pack.get("request_type").lower()
+        if request_type == "generate_otp":
+            request_email = details_pack.get("email")
+            modules.GenerateOTP(request_email,"forgot_details")
+            return JsonResponse({"message" : "hi"})
+        
     
 def AdminLogout(request):
     logout(request)

@@ -2,20 +2,45 @@ import random, smtplib
 
 
 
-def GenerateOTP(email,Name):
+def GenerateOTP(**details):
+    Name = details.get("name")
+    receiver_email = details.get("email")
+    request_type = details.get("request_type")
+    if not receiver_email:
+        raise Exception("No email address input found")
+
     if not Name:
         Name = "**Name not defined**\n"
-    receiver_email = email
+    
     otp = random.randint(100000,999999)
     sender_email = "otpmail.noreply@gmail.com"
     app_password = "dxrrnmilxweeznoz"
-    subject = "Your OTP for registration"
-    message = f"""
-    Hey Ms./Mr.{Name},
-    This is your otp : {otp} for registration.
-    Thankyou for registering.
-    From : Mail Bot Service, login.
-    """
+
+    if request_type == "registration":
+        subject = "Your OTP for registration"
+        
+        message = f"""
+        Hey Ms./Mr.{Name},
+        This is your otp : {otp} for registration.
+        Thankyou for registering.
+        From : Mail Bot Service, login.
+        """
+
+    elif request_type == "forgot_details":
+        subject = "Forgot Details | Your account Has been accessed"
+        message = f"""
+        Hey Mr/Ms. {Name},
+        Is that you Trying to access Your account??
+        Here is the otp: {otp},
+        If its not you, Please once verify your password.
+        Thankyou.
+
+        From : MailBot.
+
+        """
+    else:
+        subject = "otp"
+        message = f"OTP : {otp}, Thankyou"
     text = f"Subject : {subject}\n\n{message}"
     print("Please wait... sending email")
     try :

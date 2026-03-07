@@ -8,5 +8,5 @@ urlpatterns = [
     path("dashboard",views.AdminDashboard),
     path("login",views.AdminLogin),
     path("logout",views.AdminLogout),
-    path("forgot_password", views.ForgotPassword),
+    path("forgot_details",views.AdminForgotDetails)
 ]
