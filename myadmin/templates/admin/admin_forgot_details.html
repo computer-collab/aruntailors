@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .hidden{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <forms >
+        {% csrf_token %}
+        <div id="ForgotPassword" class="hidden">
+          <div id="EmailAddressDiv" class="hidden">  <input placeholder="Enter Email Address" name="EmailBox" type="email" required>
+            <br><button id="GenerateOtp" type="button">GenerateOtp</button></div>
+
+
+            <br>
+            <div id="OtpBoxDiv" class="hidden">
+            <input placeholder="Enter the OTP" name = "OTPBox" type="password">
+            <br>
+            <button id="VerifyEmailAddress">Submit</button>
+</div>
+        </div>
+        <div id="ChangePassword" class="hidden">
+            <input placeholder="Enter Password" id="PasswordBox1">
+            <input placeholder="re-nter Password" id="PasswordBox2">
+            <button id="SubmitPassword">Submit</button>
+        </div>
+    </forms>
+    <div id="MessageBox"></div>
+
+
+
+
+    <!---------------- Scripting   ------------------ -->
+    <script >
+        
+        const EmailAddressDiv = document.getElementById("EmailAddressDiv");
+        const OtpVerificationDiv = document.getElementById("OtpBoxDiv");
+        const ChangePasswordDiv = document.getElementById("ChangePassword");
+        const ForgotPasswordVerifyDiv = document.getElementById("ForgotPassword");
+        const EmailBox = document.querySelector("[name=EmailBox]");
+        const GenerateOtpButton = document.getElementById("GenerateOtp");
+        const OtpBox = document.querySelector("[name=OTPBox]");
+        const VerifyEmailAddressButton = document.querySelector("#VerifyEmailAddress");
+        const MessageBox = document.getElementById("MessageBox");
+        let request_type;
+        
+        
+        window.onload = () =>{
+            fetch("forgot_details",{
+                method : "POST",
+                headers : {
+                    "X-CSRFToken" : document.querySelector("[name=csrfmiddlewaretoken]").value,
+                    "Content-Type" : "application/json"
+                }, body : JSON.stringify ({ request_type : "setup"})
+            }).then (res => res.json()).then(server=>{
+                if (server.setup === "email_done"){
+                    EmailAddressDiv.classList.add("hidden")
+                    OtpVerificationDiv.classList.remove("hidden")
+                    MessageBox.innerHTML = server.message
+                }else {
+                    EmailAddressDiv.classList.remove("hidden");
+                    ForgotPasswordVerifyDiv.classList.remove("hidden")
+                    
+                }  
+            })
+        }
+
+    </script>
+    </body>
+    </html>

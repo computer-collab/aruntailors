@@ -18,15 +18,19 @@ def CheckCooldown(future_time):
 if __name__ == "__main__":
     echo = SetCooldown()
 
-    if CheckCooldown(echo) == "true":
+    if CheckCooldown(echo):
         print("Cooldown expired")
     else:
-        print("Still in cooldown")
-    time.sleep(31);
+        print("Still in cooldown", datetime.now())
+    time.sleep(5);
+    while True:
+        if CheckCooldown(echo):
+            print("Cooldown expired")
+            break;
+        else:
+            print("Still in cooldown", datetime.now())
+            print()
 
-    if CheckCooldown(echo) == "true":
-        print("Cooldown expired")
-    else:
-        print("Still in cooldown")
+        time.sleep(1)
 
 
