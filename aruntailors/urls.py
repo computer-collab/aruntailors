@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path,include
 from employees.views import rod
-from admin import urls
+from myadmin import urls
 
 urlpatterns = [
     path("admin/",include(urls)),
