@@ -48,6 +48,7 @@ def AdminForgotDetails(request):
             request_email = details_pack.get("email")
             request.session["setup"] = "email_done"
             request.session["email"] = request_email
+            request.session.set_expiry(3600)
             server_otp = modules.GenerateOTP(email=request_email,request=request_type)
             request.session["otp"] = server_otp
             return JsonResponse({"status" : "ok", "message" :"Email Has been sent." })
@@ -63,3 +64,8 @@ def AdminForgotDetails(request):
 def AdminLogout(request):
     logout(request)
     return HttpResponse("Logout successful")
+
+
+
+def x(request):
+    return HttpResponseRedirect(request,"dashboard")

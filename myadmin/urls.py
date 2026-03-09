@@ -5,6 +5,7 @@ from myadmin import views
 # from django.http import request
 
 urlpatterns = [
+    path("", views.x),
     path("dashboard",views.AdminDashboard),
     path("login",views.AdminLogin),
     path("logout",views.AdminLogout),

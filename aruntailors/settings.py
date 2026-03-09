@@ -59,7 +59,11 @@ ROOT_URLCONF = 'aruntailors.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, "templates"), os.path.join(BASE_DIR,"admin","templates")],
+        'DIRS': [
+            os.path.join(BASE_DIR, "templates"),
+            os.path.join(BASE_DIR,"admin","templates"),
+            os.path.join(BASE_DIR,"aruntailors","templates"),
+            ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
