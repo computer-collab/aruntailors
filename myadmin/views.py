@@ -7,6 +7,9 @@ from django.contrib import sessions
 
 
 
+def AdminRoot(request):
+    return HttpResponseRedirect("dashboard")
+
 def AdminDashboard(request):
     if request.method  == "GET":
         if request.user.is_authenticated and request.user.is_superuser:
@@ -34,31 +37,47 @@ def AdminRegister(request):
     pass
 
 def AdminForgotDetails(request):
+    
+    returnjson = {
+        "message" : "",
+        "status" : request.session.get("status", "none"),
+        }
     if request.method == "GET":
         return render(request,"admin/admin_forgot_details.html")
     
     elif request.method == "POST":
-        
+        print(request.session.get("setup", "none"), json.loads(request.body).get("request_type"))
         details_pack = json.loads(request.body)
         request_type = details_pack.get("request_type")
         if request_type == "setup" :
-            return JsonResponse({ "setup" : request.session.get("setup" , "none") })
+            return JsonResponse({"setup" : request.session.get("setup","none")})
         
         if request_type == "generate_otp":
             request_email = details_pack.get("email")
             request.session["setup"] = "email_done"
             request.session["email"] = request_email
-            request.session.set_expiry(3600)
+            request.session.set_expiry(30000)
             server_otp = modules.GenerateOTP(email=request_email,request=request_type)
             request.session["otp"] = server_otp
+            
             return JsonResponse({"status" : "ok", "message" :"Email Has been sent." })
         
-        elif request_type == "verify_email":
+        elif request_type == "verify_otp":
             request_otp = details_pack.get("otp")
             if request.session["otp"] and request_otp == request.session.get("otp"):
+                request.session.pop("otp")
                 request.session["setup"] = "otp_done"
-                request.session.pop
-                return JsonResponse({ "message" : "Your Otp has been verified" , "status" : "ok"})
+                returnjson["message"] = "OTP verified successfully."
+                returnjson["status"] = "ok"
+                return JsonResponse(returnjson)
+            
+        elif request_type == "submit_password":
+            password_one = details_pack.get("password_one")
+            password_two = details_pack.get("password_two")
+            if password_one != password_two:
+                returnjson["message"] = "Passwords mismatch" 
+                returnjson["status"] = "failed"
+                return JsonResponse(returnjson)
         
     
 def AdminLogout(request):

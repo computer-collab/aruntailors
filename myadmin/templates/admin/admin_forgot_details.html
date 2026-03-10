@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+    {% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,7 +15,8 @@
     <forms >
         {% csrf_token %}
         <div id="ForgotPassword" class="hidden">
-          <div id="EmailAddressDiv" class="hidden">  <input placeholder="Enter Email Address" name="EmailBox" type="email" required>
+          <div id="EmailAddressDiv" class="hidden">
+              <input placeholder="Enter Email Address" name="EmailBox" type="email" required>
             <br><button id="GenerateOtp" type="button">GenerateOtp</button></div>
 
 
@@ -37,40 +39,9 @@
 
 
     <!---------------- Scripting   ------------------ -->
-    <script >
+    <script src="{% static 'myadmin/js/admin_forgot_details.js' %}">
         
-        const EmailAddressDiv = document.getElementById("EmailAddressDiv");
-        const OtpVerificationDiv = document.getElementById("OtpBoxDiv");
-        const ChangePasswordDiv = document.getElementById("ChangePassword");
-        const ForgotPasswordVerifyDiv = document.getElementById("ForgotPassword");
-        const EmailBox = document.querySelector("[name=EmailBox]");
-        const GenerateOtpButton = document.getElementById("GenerateOtp");
-        const OtpBox = document.querySelector("[name=OTPBox]");
-        const VerifyEmailAddressButton = document.querySelector("#VerifyEmailAddress");
-        const MessageBox = document.getElementById("MessageBox");
-        let request_type;
-        
-        
-        window.onload = () =>{
-            fetch("forgot_details",{
-                method : "POST",
-                headers : {
-                    "X-CSRFToken" : document.querySelector("[name=csrfmiddlewaretoken]").value,
-                    "Content-Type" : "application/json"
-                }, body : JSON.stringify ({ request_type : "setup"})
-            }).then (res => res.json()).then(server=>{
-                if (server.setup === "email_done"){
-                    EmailAddressDiv.classList.add("hidden")
-                    OtpVerificationDiv.classList.remove("hidden")
-                    MessageBox.innerHTML = server.message
-                }else {
-                    EmailAddressDiv.classList.remove("hidden");
-                    ForgotPasswordVerifyDiv.classList.remove("hidden")
-                    
-                }  
-            })
-        }
-
+     
     </script>
     </body>
-    </html>
+    </html> 
