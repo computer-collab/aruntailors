@@ -15,13 +15,20 @@
     <forms >
         {% csrf_token %}
         <div id="ForgotPassword" class="hidden">
-          <div id="EmailAddressDiv" class="hidden">
-              <input placeholder="Enter Email Address" name="EmailBox" type="email" required>
+          <div id="UsernameDiv" class="hidden">
+            <label for="UserName">
+                Enter Username:
+            </label>
+              <input placeholder="Enter Username" name="Username" id="UserName" type="text" required>
             <br><button id="GenerateOtp" type="button">GenerateOtp</button></div>
-
 
             <br>
             <div id="OtpBoxDiv" class="hidden">
+            <div >
+                <h1 name="HeaderMessage">
+
+                </h1>
+            </div>
             <input placeholder="Enter the OTP" name = "OTPBox" type="password">
             <br>
             <button id="VerifyEmailAddress">Submit</button>
