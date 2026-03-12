@@ -193,12 +193,9 @@ SubmitPasswordButton.addEventListener("click", SubmitPassword => {
                 "X-CSRFToken" : document.querySelector("[name=csrfmiddlewaretoken]").value,
                 "content-type" : "application/json"
             }, body : JSON.stringify (password_pack)
-        }).then(res=>res.json).then(server=>{
+        }).then(res=>res.json()).then(server=>{
           alert(JSON.stringify(server))
-          alert("Response recieved")
-          alert(server.status,server.message)
-            if (server.status === "ok"){
-                location.reload()
+        if (server.status==="ok"){
                 UserNameDiv.classList.add("hidden");
                 OtpVerificationDiv.classList.add("hidden");
                 ChangePasswordDiv.classList.add("hidden");

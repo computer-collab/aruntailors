@@ -132,6 +132,7 @@ def AdminForgotDetails(request):
                         returnjson["message"] = "Password reset successful."
                         returnjson["status"] = "ok"
                         print("Password reset successful")
+                        print(returnjson)
                         return JsonResponse(returnjson)
                     else:
                         print(request.session.get("username","none"))
