@@ -4,18 +4,12 @@ import json
 import modules
 from django.contrib.auth import login, logout, decorators,authenticate, models
 from django.contrib import sessions
+from modules import time
+from modules.mails import MaskEmail, GenerateOTP
 
 
-def mask_email(email):
-    name, domain = email.split("@")
-    
-    if len(name) <= 2:
-        masked_name = name[0] + "*"
-    else:
-        masked_name = name[:2] + "*" * (len(name) - 2)
-
-    return f"{masked_name}@{domain}"
-
+status = "status" 
+message = "message"
 
 def AdminRoot(request):
     return HttpResponseRedirect("dashboard")
@@ -64,32 +58,57 @@ def AdminForgotDetails(request):
         
         # Step 1 : Generate OTP and send to email
         if request_type == "generate_otp":
+            request.session["request"] = details_pack.get("request")
             request_username = details_pack.get("username")
-            request.session["setup"] = "email_done"
+            request.session["setup"] = "username_done"
             request.session["username"] = request_username
             QueryUser = models.User.objects.filter(username=request_username)
-            if not QueryUser:
+            print("reqeust accepted")
+            if not QueryUser and not request.session.get("query_user"):
                 
                 return JsonResponse({"status" : "failed", "message" :"No user found with the provided username." })
-            elif QueryUser:
-                QueryEmail = QueryUser.first().email
-                if not QueryEmail:
+            elif QueryUser or request.session.get("query_user"):
+                try:
+                    request.session["query_user"] = QueryUser.first().username
+                    QueryEmail = QueryUser.first().email
+                    request.session["query_email"] = QueryEmail
+                
+                except:
+                    pass
+                # Sending the email upon reqeust
+                if request.session.get("cooldown", None)is None or  time.CheckCooldown(request.session.get("cooldown")):
+                    request.session["cooldown"] = time.SetCooldown()
+                    server_otp = modules.GenerateOTP(email=request.session.get("query_email"),request=request.session.get("request","generate_otp"))
+                    request.session["otp"] = server_otp
+                    returnjson["message"] = f"Email has sent to {MaskEmail(request.session.get("query_email"))}"
+                    returnjson["status"] = "ok"
+                    request.session["otp"] = server_otp
+                    
+                
+                elif not time.CheckCooldown(request.session.get("cooldown")):
+                   
+                    returnjson["message"] = "Timer is under cooldown"
+                if not request.session.get("query_email"):
                     returnjson["message"] = "No email associated with this account."
                     returnjson["status"] = "failed"
             request.session.set_expiry(30000)
-            server_otp = modules.GenerateOTP(email=QueryEmail,request=request_type)
-            request.session["otp"] = server_otp
+
             
-            return JsonResponse({"status" : "ok", "message" :"Email Has been sent." })
+            return JsonResponse(returnjson)
         
         # Step 2 : Verify OTP
         elif request_type == "verify_otp":
             request_otp = details_pack.get("otp")
-            if request.session["otp"] and request_otp == request.session.get("otp"):
+            if  str(request_otp) == str(request.session.get("otp")):
                 request.session.pop("otp")
                 request.session["setup"] = "otp_done"
                 returnjson["message"] = "OTP verified successfully."
                 returnjson["status"] = "ok"
+                return JsonResponse(returnjson)
+            else :
+                
+                returnjson["message"] = "OTP mismatch!!!"
+                returnjson["status"] = "failed"
                 return JsonResponse(returnjson)
             
         # Step 3 : Set new password

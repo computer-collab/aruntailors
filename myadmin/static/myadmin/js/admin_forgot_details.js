@@ -1,3 +1,9 @@
+//Imports
+function clicked(){
+    window.alert("This element is sclicked")
+}
+
+// Constants for Document Objects
 const UserNameDiv = document.getElementById("UsernameDiv");
 const OtpVerificationDiv = document.getElementById("OtpBoxDiv");
 const ChangePasswordDiv = document.getElementById("ChangePassword");
@@ -7,8 +13,18 @@ const GenerateOtpButton = document.getElementById("GenerateOtp");
 const OtpBox = document.querySelector("[name=OTPBox]");
 const VerifyEmailAddressButton = document.querySelector("#VerifyEmailAddress");
 const MessageBox = document.getElementById("MessageBox");
+const ResendOtp = document.querySelector("[name=ResendOtp]") ;
+const SubmitPasswordButton = document.getElementById("SubmitPasswordButton")
 let request_type;
 
+function ToggleDisable(object, innerhtml, type, message ){
+    object.innerHTML = innerhtml;
+    object.disabled = type;
+    if (message){
+        MessageBox.innerHTML = message
+    }
+    
+}
 window.onload = () =>{
     fetch("forgot_details",{
         method : "POST",
@@ -41,13 +57,14 @@ window.onload = () =>{
         }
     })
 }
-GenerateOtpButton.addEventListener("click", cick=>{
-    cick.preventDefault();
-    request_type = "generate_otp";
+GenerateOtpButton.addEventListener("click", button=>{
+    button.preventDefault();
+    request_type = "generate_otp"; request = "forgot_details";
+    
     const UserName = UsernameBox.value
     const payload = {
         request_type : request_type,
-        username : UserName
+        username : UserName, request : request
     }
 
     GenerateOtpButton.innerHTML = "Generating OTP..."
@@ -73,12 +90,16 @@ GenerateOtpButton.addEventListener("click", cick=>{
     })
 })
 
-
+/// for verify email address button
 VerifyEmailAddressButton.addEventListener("click", cick=>{
     cick.preventDefault();
     request_type = "verify_otp";
+   
     const otp  = OtpBox.value;
     const data_pack = { request_type : request_type , otp : otp }
+
+    VerifyEmailAddressButton.disabled = true;
+    VerifyEmailAddressButton.innerHTML = "Verifying..."
     
 
     fetch(window.location.href,{
@@ -86,9 +107,11 @@ VerifyEmailAddressButton.addEventListener("click", cick=>{
         headers : {
             "X-CSRFToken" : document.querySelector("[name=csrfmiddlewaretoken]").value,
             "content-type" : "application/json"
-        }, body : JSON.stringify(data_pack)
+        }, body : JSON.stringify(data_pack)})
         .then(res => res.json()).then( server=>{
-            alert(server.email)
+            alert(server.message);
+            VerifyEmailAddressButton.disabled = false;
+            VerifyEmailAddressButton.innerHTML = "Submit"
 
             if (server.status === "ok"){
                 UserNameDiv.classList.add("hidden");
@@ -103,7 +126,44 @@ VerifyEmailAddressButton.addEventListener("click", cick=>{
         }
             
         )
+        .catch(error => {
+             VerifyEmailAddressButton.disabled = false;
+            VerifyEmailAddressButton.innerHTML = "Submit"
+        })
+        
     })
 
 
+    /// For resend otp anchor tag
+document.querySelector("[name=ResendOtp]").addEventListener("click",(Resend)=>{
+    Resend.preventDefault();
+    ToggleDisable(ResendOtp,"Sending...",true);
+    request_type = "generate_otp";
+     request = "forgot_details";
+    const payload = {
+        request_type : request_type
+        , request : request
+    }
+    fetch(window.location.href,{
+      method : "POST",
+      headers : {
+        "X-CSRFToken" : document.querySelector("[name=csrfmiddlewaretoken]").value,
+        "Content-Type" : "application/json"
+      }  , body  : JSON.stringify({request_type : request_type})})
+      .then(res=> res.json()).then(server =>{
+   
+    ToggleDisable(ResendOtp,"Sent...",false);
+    setTimeout(1000)
+    ToggleDisable(ResendOtp,"Resend OTP",false,server.message);
+      }).catch(error=>{
+            ToggleDisable(ResendOtp,"Error...",false);
+            setTimeout(1000)
+            ToggleDisable(ResendOtp,"Resend OTP",false,"error");
+
+      })
+    })
+
+SubmitPasswordButton.addEventListener("click",SubmitPassword=>{
+    SubmitPassword.preventDefault();
+    
 })

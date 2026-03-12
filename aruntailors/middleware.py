@@ -1,0 +1,3 @@
+from django.http import  HttpResponseForbidden
+
+## IT IS IMPORTANT TO NOTE THAT WE MUST NOT ALLOW ADMIN TO BE ONTHE PUBLIC DOMAIN

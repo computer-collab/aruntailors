@@ -57,3 +57,8 @@ def GenerateOTP(**details):
         return "Error_exception"
     
 
+def MaskEmail(email: str) -> str:
+    name, domain = email.split("@")
+    n = len(name)
+    masked_name = name[0] + "*" * (n - 1) if n <= 6 else name[:3] + "*" * (n - 6) + name[-3:]
+    return f"{masked_name}@{domain}"

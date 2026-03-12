@@ -29,15 +29,20 @@
 
                 </h1>
             </div>
+            <label for = "[name=OTPBox]">Enter OTP:</label>
+            <br>
             <input placeholder="Enter the OTP" name = "OTPBox" type="password">
+            <br>
+
+            <a name="ResendOtp" 1>REsend otp</a>
             <br>
             <button id="VerifyEmailAddress">Submit</button>
 </div>
         </div>
         <div id="ChangePassword" class="hidden">
-            <input placeholder="Enter Password" id="PasswordBox1">
-            <input placeholder="re-nter Password" id="PasswordBox2">
-            <button id="SubmitPassword">Submit</button>
+            <input placeholder="Enter Password" id="PasswordBox1" type="password">
+            <input placeholder="re-nter Password" id="PasswordBox2" type="password">
+            <button id="SubmitPasswordButton">Submit</button>
         </div>
     </forms>
     <div id="MessageBox"></div>
@@ -46,7 +51,7 @@
 
 
     <!---------------- Scripting   ------------------ -->
-    <script src="{% static 'myadmin/js/admin_forgot_details.js' %}">
+    <script  src="{% static 'myadmin/js/admin_forgot_details.js' %}">
         
      
     </script>
