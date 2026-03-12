@@ -194,6 +194,9 @@ SubmitPasswordButton.addEventListener("click", SubmitPassword => {
                 "content-type" : "application/json"
             }, body : JSON.stringify (password_pack)
         }).then(res=>res.json).then(server=>{
+          alert(JSON.stringify(server))
+          alert("Response recieved")
+          alert(server.status,server.message)
             if (server.status === "ok"){
                 location.reload()
                 UserNameDiv.classList.add("hidden");
@@ -204,6 +207,8 @@ SubmitPasswordButton.addEventListener("click", SubmitPassword => {
             }else{
                 MessageBox.innerHTML = server.message;
             }
+        }).catch( err=>{
+          alert("console error" , err)
         })
     }
 })

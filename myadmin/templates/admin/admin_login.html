@@ -8,8 +8,12 @@
 <body>
     <form>
         {% csrf_token%}
+        <label for="UsernameBox" > Enter Username: </label>
         <input id = "UsernameBox" placeholder="Username" type="text">
+      <br>
+      <label for="PasswordBox">Enter Password:</label>
         <input id = "PasswordBox" placeholder="Password" type="password">
+        <br>
         <a href="forgot_details">Forgot your details??</a>
         <div id="message"></div>
         <button id="submit">Submit</button>

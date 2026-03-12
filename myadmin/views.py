@@ -138,6 +138,7 @@ def AdminForgotDetails(request):
                         print("User not found")
                         returnjson["message"] = "User not found."
                         returnjson["status"] = "failed"
+                        print(returnjson)
                         return JsonResponse(returnjson)
                 
 
