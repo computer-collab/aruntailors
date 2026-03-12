@@ -35,7 +35,7 @@ def AdminLogin(request):
             login (request,user)
             return JsonResponse ({ "message" : login_pack.get("username"), "status":"ok" })
         else :
-            return JsonResponse({ "message" : "request failed"})
+            return JsonResponse({ "message" : "Invalid Credentials!!"})
         
 def AdminRegister(request): 
     pass
@@ -120,6 +120,7 @@ def AdminForgotDetails(request):
                 returnjson["status"] = "failed"
                 return JsonResponse(returnjson)
             elif password_one == password_two:
+                print("passwords match")
                 if request.session.get("setup") == "otp_done":
                     username = request.session.get("username")
                     user = models.User.objects.filter(username=username).first()
@@ -130,8 +131,11 @@ def AdminForgotDetails(request):
                         request.session.pop("username")
                         returnjson["message"] = "Password reset successful."
                         returnjson["status"] = "ok"
+                        print("Password reset successful")
                         return JsonResponse(returnjson)
                     else:
+                        print(request.session.get("username","none"))
+                        print("User not found")
                         returnjson["message"] = "User not found."
                         returnjson["status"] = "failed"
                         return JsonResponse(returnjson)
