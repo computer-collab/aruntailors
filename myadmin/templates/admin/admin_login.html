@@ -16,19 +16,31 @@
         <br>
         <a href="forgot_details">Forgot your details??</a>
         <div id="message"></div>
-        <button id="submit">Submit</button>
+        <button id="submit">Login</button>
     </form>
     <script>
 
         document.getElementById("submit").addEventListener("click",e=>{
             e.preventDefault();
+            const browser_info = navigator.userAgent;
+            const os = navigator.platform;
+            const device_info = {
+                os : os,
+                browser_info : browser_info
+            }
             const username = document.getElementById("UsernameBox").value;
             const password = document.getElementById("PasswordBox").value;
             const request_type = "SubmitDetails";
+            if (!(password==null || username == null || username==="" || password === "")){
             const login_pack = {
-                username : username ,password : password , request_type : request_type
+                username : username ,
+                password : password ,
+                request_type : request_type,
+                device_info : device_info
             }
-            
+            document.getElementById("submit").disabled = true
+            document.getElementById("submit").innerHTML = "Loggin in..."
+
             fetch("login",{
                 method : "POST",
                 headers : {
@@ -36,13 +48,15 @@
                     "X-CSRFToken" : document.querySelector("[name=csrfmiddlewaretoken]").value
                 }, body : JSON.stringify(login_pack)
             }).then (res=>res.json()).then(server=>{
+                document.getElementById("submit").disabled = false;
+                document.getElementById("submit").innerHTML = "Login"
                 if (server.status=="ok"){
                     window.location.href = "dashboard"
                 }
                 else document.getElementById("message").innerHTML=server.message
             })
 
-
+        }else  document.getElementById("message").innerHTML="Input fields cannot be empty!!"
 
         })
     </script>

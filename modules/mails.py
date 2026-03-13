@@ -2,10 +2,11 @@ import random, smtplib
 
 
 
-def GenerateOTP(**details):
+def GenerateEmail(**details):
     Name = details.get("name")
     receiver_email = details.get("email")
     request_type = details.get("request")
+    device_info = details.get("device_info",{})
     if not receiver_email:
         raise Exception("No email address input found")
 
@@ -36,6 +37,23 @@ def GenerateOTP(**details):
         Thankyou.
 
         From : MailBot.
+
+        """
+    elif request_type == "new_login_activity":
+        device_type = device_info.get("os")
+        browser_info = device_info.get("browser_info")
+        login_activity = "Successful" if device_info.get("login_activity") else "a failed attempt"
+        subject = "New Device Login Detected."
+        message = f"""
+        Hey Mr/Ms. {Name},
+        Are you trying to login on {device_type}??
+        New Suspecious Login activity detected!!
+        This login activity was {login_activity}.
+        If its not you, please change your password!!
+
+        If its yes, very great to see you. Please ignore...
+
+        From : MailBot Login Handler.
 
         """
     else:

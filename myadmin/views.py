@@ -1,19 +1,24 @@
+# Default imports
 from django.shortcuts import render,redirect
 from django.http import request,JsonResponse,HttpResponse,HttpResponseRedirect
 import json
-import modules
 from django.contrib.auth import login, logout, decorators,authenticate, models
 from django.contrib import sessions
+from django.contrib.auth.models import User
+# custom imports
+import modules
 from modules import time
-from modules.mails import MaskEmail, GenerateOTP
+from modules.mails import MaskEmail, GenerateEmail
 
-
+# Some dump variables
 status = "status" 
 message = "message"
 
+
+#### REdirecting the admin root to dashboard
 def AdminRoot(request):
     return HttpResponseRedirect("dashboard")
-
+#### Admin page root 
 def AdminDashboard(request):
     if request.method  == "GET":
         if request.user.is_authenticated and request.user.is_superuser:
@@ -21,7 +26,7 @@ def AdminDashboard(request):
            
         else:
             return HttpResponseRedirect("login")
-
+#### Admin Login
 def AdminLogin(request):
     if request.method == "GET":
         return render(request,"admin/admin_login.html")
@@ -30,15 +35,31 @@ def AdminLogin(request):
         login_pack = json.loads(request.body)
         Username = login_pack.get("username")
         Password = login_pack.get("password")
-        user = authenticate(request,username=Username,password=Password)
-        if user is not None:
+        DeviceInfo = login_pack.get("device_info")
+        userLogin = authenticate(request,username=Username,password=Password)
+        try :
+            user = User.objects.get(username = Username)
+        except:
+            return JsonResponse({"message" : "Invalid Credentials" , status : "failed"})
+        if userLogin is not None :
+            OperatingSystem = DeviceInfo.get("os")
+            BrowsingSystem = DeviceInfo.get("browser_info")
             login (request,user)
+            DeviceInfo["login_activity"] = True
+
+            GenerateEmail(name= user.first_name if user.first_name is not None else "" , email = user.email, device_info = DeviceInfo, request = "new_login_activity",  )
             return JsonResponse ({ "message" : login_pack.get("username"), "status":"ok" })
         else :
+            
             return JsonResponse({ "message" : "Invalid Credentials!!"})
-        
+
+
+#### For registering the new admin
 def AdminRegister(request): 
     pass
+
+
+######  For changing The password of a given user
 
 def AdminForgotDetails(request):
     
@@ -62,7 +83,7 @@ def AdminForgotDetails(request):
             request_username = details_pack.get("username")
             request.session["setup"] = "username_done"
             request.session["username"] = request_username
-            QueryUser = models.User.objects.filter(username=request_username)
+            QueryUser = models.User.objects.get(username=request_username)
             print("reqeust accepted")
             if not QueryUser and not request.session.get("query_user"):
                 
@@ -70,15 +91,16 @@ def AdminForgotDetails(request):
             elif QueryUser or request.session.get("query_user"):
                 try:
                     request.session["query_user"] = QueryUser.first().username
-                    QueryEmail = QueryUser.first().email
+                    QueryEmail = QueryUser.email
                     request.session["query_email"] = QueryEmail
+                    request.session.pop("setup")
                 
                 except:
                     pass
                 # Sending the email upon reqeust
                 if request.session.get("cooldown", None)is None or  time.CheckCooldown(request.session.get("cooldown")):
                     request.session["cooldown"] = time.SetCooldown()
-                    server_otp = modules.GenerateOTP(email=request.session.get("query_email"),request=request.session.get("request","generate_otp"))
+                    server_otp = modules.GenerateEmail(email=request.session.get("query_email"),request=request.session.get("request","generate_otp"))
                     request.session["otp"] = server_otp
                     returnjson["message"] = f"Email has sent to {MaskEmail(request.session.get("query_email"))}"
                     returnjson["status"] = "ok"

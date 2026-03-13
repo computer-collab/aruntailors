@@ -1,2 +1,2 @@
-from modules.mails import GenerateOTP
+from modules.mails import GenerateEmail
 
