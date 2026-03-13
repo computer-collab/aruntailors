@@ -4,8 +4,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard | Admin</title>
+    <style >
+        .hidden{
+            display: none;
+        }
+        #ProfileSidePanelBackDiv{
+            position: fixed;
+            width: 100%;
+            overflow: hidden;
+            top: 0px;
+            left: 0px;
+            background-color: rgba(0,0,0,0.4);
+            
+            height: 100vh;
+            overflow: hidden;
+            scroll-behavior: n;
+
+        }
+        #ProfileSidePanel{
+            position :absolute;
+            top: 0px;
+            left: 0px;
+            width: 75vw;
+            max-width: 500px;
+            height: 100vh;
+            overflow-y: scroll;
+            overflow-x: scroll;
+            background-color: aquamarine;
+
+        }
+    </style>
 </head>
 <body>
-    <h1> This is dashboard</h1>
+    {% load static %}
+    <nav >
+        <img id = "ProfileButton"  src="profiles/pics/demo-profile.jpg" style="height: 25px; width:  25px; border-radius: 50%;">
+        <a>HOME</a>
+        
+    </nav>
+    <div id="ProfileSidePanelBackDiv" class="hidden">
+    <div id="ProfileSidePanel" >
+
+    </div></div>
+    <div id="container">
+        <button id="AddEmployeesButton">Add AddEmployeesButton</button>
+    </div>
+    <script>
+        const ProfileSidePanel = document.getElementById("ProfileSidePanel");
+        const ProfileSidePanelBackDiv = document.getElementById("ProfileSidePanelBackDiv");
+        const ProfileButton = document.getElementById("ProfileButton");
+        ProfileButton.addEventListener("click",profileView=>{
+            profileView.preventDefault();
+            ProfileSidePanelBackDiv.classList.remove("hidden");
+
+        })
+
+    </script>
 </body>
 </html>

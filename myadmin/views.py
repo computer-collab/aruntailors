@@ -175,3 +175,8 @@ def AdminLogout(request):
 
 def x(request):
     return HttpResponseRedirect(request,"dashboard")
+
+
+def profile_pic(request,picname):
+    with open(f"myadmin/profiles/pics/{picname}", "rb") as f:
+        return HttpResponse(f.read(), content_type="image/jpeg")
