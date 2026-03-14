@@ -14,12 +14,13 @@
       <label for="PasswordBox">Enter Password:</label>
         <input id = "PasswordBox" placeholder="Password" type="password">
         <br>
+        <small  id="message" id="MessageBox">   </small><br>
+        
         <a href="forgot_details">Forgot your details??</a>
-        <div id="message"></div>
         <button id="submit">Login</button>
     </form>
     <script>
-
+        const MessageBox = document.getElementById("MessageBox");
         document.getElementById("submit").addEventListener("click",e=>{
             e.preventDefault();
             const browser_info = navigator.userAgent;
@@ -54,6 +55,10 @@
                     window.location.href = "dashboard"
                 }
                 else document.getElementById("message").innerHTML=server.message
+            }).catch(error=>{
+                document.getElementById("submit").disabled = false;
+                document.getElementById("submit").innerHTML = "Login"
+                document.getElementById("message").innerHTML = "An error occurred. Please try again."
             })
 
         }else  document.getElementById("message").innerHTML="Input fields cannot be empty!!"

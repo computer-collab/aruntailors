@@ -15,8 +15,5 @@ class Profile(models.Model):
     DateOfBirth = models.DateField(null=True, blank=True)
     PhoneNumber = models.CharField(max_length=15)
     Address = models.CharField(max_length=1000, null = True, blank= False)
-    Email = models.CharField(max_length=(256))
-
-    
     
 
