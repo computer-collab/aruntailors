@@ -179,16 +179,11 @@ SubmitPasswordButton.addEventListener("click", SubmitPassword => {
         MessageBox.innerHTML = "Both passwords must be same!!!";
         window.alert("The password fields doesnt match!!")
     }
-    else { 
-        
-        const device_info = {
-        browser_info : navigator.userAgent,
-        os : navigator.platform}
+    else {
         const password_pack = {
             request_type: request_type,
             password_one: password_one,
-            password_two: password_two,
-            device_info :device_info
+            password_two: password_two
         };
 
 

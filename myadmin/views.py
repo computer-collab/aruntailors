@@ -22,7 +22,7 @@ def AdminRoot(request):
 def AdminDashboard(request):
     if request.method  == "GET":
         if request.user.is_authenticated and request.user.is_superuser:
-            return render(request,"admin/admin_dashboard.html")
+            return render(request,"admin/admin_dashboard.html",{"username":request.user.username})
            
         else:
             return HttpResponseRedirect("login")
@@ -68,7 +68,7 @@ def AdminForgotDetails(request):
         "status" : request.session.get("status", "none"),
         }
     if request.method == "GET":
-        return render(request,"admin/admin_forgot_details.html")
+        return render(request,"admin/admin_forgot_details.html",{"username" : request.user.username})
     
     elif request.method == "POST":
         print(request.session.get("setup", "none"), json.loads(request.body).get("request_type"))
@@ -178,5 +178,10 @@ def x(request):
 
 
 def profile_pic(request,picname):
-    with open(f"myadmin/profiles/pics/{picname}", "rb") as f:
-        return HttpResponse(f.read(), content_type="image/jpeg")
+    try :
+        with open(f"myadmin/profiles/pics/{picname}", "rb") as f:
+          return HttpResponse(f.read(), content_type="image/jpeg")
+    except: 
+        with open(f"myadmin/profiles/pics/blank_profile.jpg", "rb") as f:
+      
+          return HttpResponse(f.read(), content_type="image/jpeg")
