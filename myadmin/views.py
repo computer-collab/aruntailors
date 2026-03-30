@@ -35,7 +35,14 @@ def AdminLogin(request):
         login_pack = json.loads(request.body)
         Username = login_pack.get("username")
         Password = login_pack.get("password")
-        DeviceInfo = login_pack.get("device_info")
+        try:
+            DeviceInfo = login_pack.get("device_info")
+
+
+        except:
+            DeviceInfo = {
+                "os" : "Unknown", "browser_info" : "Unknown"
+            }
         userLogin = authenticate(request,username=Username,password=Password)
         try :
             user = User.objects.get(username = Username)
@@ -96,7 +103,7 @@ def AdminForgotDetails(request):
                     request.session.pop("setup")
                 
                 except:
-                    pass
+                    print("No email address was found on this mail")
                 # Sending the email upon reqeust
                 if request.session.get("cooldown", None)is None or  time.CheckCooldown(request.session.get("cooldown")):
                     request.session["cooldown"] = time.SetCooldown()
