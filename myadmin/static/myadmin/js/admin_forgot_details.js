@@ -89,6 +89,9 @@ GenerateOtpButton.addEventListener("click", button => {
         } else {
             MessageBox.innerHTML = server.message
         }
+    }).catch(err=>{
+        MessageBox.innerHTML = "Currently we are facing a technical issue."
+        GenerateOtpButton.disabled=false
     })
 })
 

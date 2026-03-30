@@ -78,9 +78,11 @@ def AdminForgotDetails(request):
         return render(request,"admin/admin_forgot_details.html",{"username" : request.user.username})
     
     elif request.method == "POST":
+        print("post metthod")
         print(request.session.get("setup", "none"), json.loads(request.body).get("request_type"))
         details_pack = json.loads(request.body)
         request_type = details_pack.get("request_type")
+        print("request type", request_type)
         if request_type == "setup" :
             return JsonResponse({"setup" : request.session.get("setup","none")})
         
@@ -90,8 +92,16 @@ def AdminForgotDetails(request):
             request_username = details_pack.get("username")
             request.session["setup"] = "username_done"
             request.session["username"] = request_username
-            QueryUser = models.User.objects.get(username=request_username)
-            print("reqeust accepted")
+            QueryUser=None
+            try:
+
+                QueryUser = models.User.objects.get(username=request_username)
+                print("reqeust accepted")
+            except Exception as e:
+                print()
+                print(e)
+                print()
+                print("sorry try failed")
             if not QueryUser and not request.session.get("query_user"):
                 
                 return JsonResponse({"status" : "failed", "message" :"No user found with the provided username." })
@@ -104,6 +114,9 @@ def AdminForgotDetails(request):
                 
                 except:
                     print("No email address was found on this mail")
+                    returnjson["status"] = "failed"
+                    returnjson["message"] = "No email addresss is bound to this  user"
+                    return JsonResponse(returnjson)
                 # Sending the email upon reqeust
                 if request.session.get("cooldown", None)is None or  time.CheckCooldown(request.session.get("cooldown")):
                     request.session["cooldown"] = time.SetCooldown()
