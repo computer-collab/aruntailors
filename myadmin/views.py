@@ -92,11 +92,12 @@ def AdminForgotDetails(request):
             request_username = details_pack.get("username")
             request.session["setup"] = "username_done"
             request.session["username"] = request_username
+            # Declararion of the query user for future using none
             QueryUser=None
             try:
 
                 QueryUser = models.User.objects.get(username=request_username)
-                print("reqeust accepted")
+                # print("reqeust accepted") # query ing the user from database
             except Exception as e:
                 print()
                 print(e)
@@ -116,9 +117,12 @@ def AdminForgotDetails(request):
                     print("No email address was found on this mail")
                     returnjson["status"] = "failed"
                     returnjson["message"] = "No email addresss is bound to this  user"
-                    return JsonResponse(returnjson)
+                    
+                if not request.session.get("query_email"):
+                    returnjson["message"] = "No email associated with this account."
+                    returnjson["status"] = "failed"
                 # Sending the email upon reqeust
-                if request.session.get("cooldown", None)is None or  time.CheckCooldown(request.session.get("cooldown")):
+                elif request.session.get("cooldown", None)is None or  time.CheckCooldown(request.session.get("cooldown")):
                     request.session["cooldown"] = time.SetCooldown()
                     server_otp = modules.GenerateEmail(email=request.session.get("query_email"),request=request.session.get("request","generate_otp"))
                     request.session["otp"] = server_otp
@@ -130,9 +134,7 @@ def AdminForgotDetails(request):
                 elif not time.CheckCooldown(request.session.get("cooldown")):
                    
                     returnjson["message"] = "Timer is under cooldown"
-                if not request.session.get("query_email"):
-                    returnjson["message"] = "No email associated with this account."
-                    returnjson["status"] = "failed"
+                
             request.session.set_expiry(30000)
 
             
