@@ -26,5 +26,5 @@ jobs:
         bash run.sh
     - name: Run Server
       run: |
-        python manage.py test
+        python manage.py runserver
 
