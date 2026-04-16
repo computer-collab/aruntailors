@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+    {% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .hidden{
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <forms >
+        {% csrf_token %}
+        <div id="ForgotPassword" class="hidden">
+          <div id="UsernameDiv" class="hidden">
+            <label for="UserName">
+                Enter Username:
+            </label>
+              <input placeholder="Enter Username" name="Username" id="UserName" type="text" required>
+            <br><button id="GenerateOtp" type="button">GenerateOtp</button></div>
+
+            <br>
+            <div id="OtpBoxDiv" class="hidden">
+            <div >
+                <h1 name="HeaderMessage">
+
+                </h1>
+            </div>
+            <label for = "[name=OTPBox]">Enter OTP:</label>
+            <br>
+            <input placeholder="Enter the OTP" name = "OTPBox" type="password">
+            <br>
+
+            <a name="ResendOtp" 1>Resend otp</a>
+            <br>
+            <button id="VerifyEmailAddress">Submit</button>
+</div>
+        </div>
+        <div id="ChangePassword" class="hidden">
+            <input placeholder="Enter Password" id="PasswordBox1" type="password">
+            <input placeholder="re-nter Password" id="PasswordBox2" type="password">
+            <button id="SubmitPasswordButton">Submit</button>
+        </div>
+    </forms>
+    <div id="MessageBox"></div>
+
+
+
+
+    <!---------------- Scripting   ------------------ -->
+    <script  src="{% static 'myadmin/js/admin_forgot_details.js' %}">
+        
+     
+    </script>
+    </body>
+    </html> 

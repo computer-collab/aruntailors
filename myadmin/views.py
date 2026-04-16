@@ -1,0 +1,209 @@
+# Default imports
+from django.shortcuts import render,redirect
+from django.http import request,JsonResponse,HttpResponse,HttpResponseRedirect
+import json
+from django.contrib.auth import login, logout, decorators,authenticate, models
+from django.contrib import sessions
+from django.contrib.auth.models import User
+# custom imports
+import modules
+from modules import time
+from modules.mails import MaskEmail, GenerateEmail
+
+# Some dump variables
+status = "status" 
+message = "message"
+
+
+#### REdirecting the admin root to dashboard
+def AdminRoot(request):
+    return HttpResponseRedirect("dashboard")
+#### Admin page root 
+def AdminDashboard(request):
+    if request.method  == "GET":
+        if request.user.is_authenticated and request.user.is_superuser:
+            return render(request,"admin/admin_dashboard.html",{"username":request.user.username})
+           
+        else:
+            return HttpResponseRedirect("login")
+#### Admin Login
+def AdminLogin(request):
+    if request.method == "GET":
+        return render(request,"admin/admin_login.html")
+    
+    elif request.method == "POST":
+        login_pack = json.loads(request.body)
+        Username = login_pack.get("username")
+        Password = login_pack.get("password")
+        try:
+            DeviceInfo = login_pack.get("device_info")
+
+
+        except:
+            DeviceInfo = {
+                "os" : "Unknown", "browser_info" : "Unknown"
+            }
+        userLogin = authenticate(request,username=Username,password=Password)
+        try :
+            user = User.objects.get(username = Username)
+        except:
+            return JsonResponse({"message" : "Invalid Credentials" , status : "failed"})
+        if userLogin is not None :
+            OperatingSystem = DeviceInfo.get("os")
+            BrowsingSystem = DeviceInfo.get("browser_info")
+            login (request,user)
+            DeviceInfo["login_activity"] = True
+
+            GenerateEmail(name= user.first_name if user.first_name is not None else "" , email = user.email, device_info = DeviceInfo, request = "new_login_activity",  )
+            return JsonResponse ({ "message" : login_pack.get("username"), "status":"ok" })
+        else :
+            
+            return JsonResponse({ "message" : "Invalid Credentials!!"})
+
+
+#### For registering the new admin
+def AdminRegister(request): 
+    pass
+
+
+######  For changing The password of a given user
+
+def AdminForgotDetails(request):
+    
+    returnjson = {
+        "message" : "",
+        "status" : request.session.get("status", "none"),
+        }
+    if request.method == "GET":
+        return render(request,"admin/admin_forgot_details.html",{"username" : request.user.username})
+    
+    elif request.method == "POST":
+        print("post metthod")
+        print(request.session.get("setup", "none"), json.loads(request.body).get("request_type"))
+        details_pack = json.loads(request.body)
+        request_type = details_pack.get("request_type")
+        print("request type", request_type)
+        if request_type == "setup" :
+            return JsonResponse({"setup" : request.session.get("setup","none")})
+        
+        # Step 1 : Generate OTP and send to email
+        if request_type == "generate_otp":
+            request.session["request"] = details_pack.get("request")
+            request_username = details_pack.get("username")
+            request.session["setup"] = "username_done"
+            request.session["username"] = request_username
+            # Declararion of the query user for future using none
+            QueryUser=None
+            try:
+
+                QueryUser = models.User.objects.get(username=request_username)
+                # print("reqeust accepted") # query ing the user from database
+            except Exception as e:
+                print()
+                print(e)
+                print()
+                print("sorry try failed")
+            if not QueryUser and not request.session.get("query_user"):
+                
+                return JsonResponse({"status" : "failed", "message" :"No user found with the provided username." })
+            elif QueryUser or request.session.get("query_user"):
+                try:
+                    request.session["query_user"] = QueryUser.first().username
+                    QueryEmail = QueryUser.email
+                    request.session["query_email"] = QueryEmail
+                    request.session.pop("setup")
+                
+                except:
+                    print("No email address was found on this mail")
+                    returnjson["status"] = "failed"
+                    returnjson["message"] = "No email addresss is bound to this  user"
+                    
+                if not request.session.get("query_email"):
+                    returnjson["message"] = "No email associated with this account."
+                    returnjson["status"] = "failed"
+                # Sending the email upon reqeust
+                elif request.session.get("cooldown", None)is None or  time.CheckCooldown(request.session.get("cooldown")):
+                    request.session["cooldown"] = time.SetCooldown()
+                    server_otp = modules.GenerateEmail(email=request.session.get("query_email"),request=request.session.get("request","generate_otp"))
+                    request.session["otp"] = server_otp
+                    returnjson["message"] = f"Email has sent to {MaskEmail(request.session.get("query_email"))}"
+                    returnjson["status"] = "ok"
+                    request.session["otp"] = server_otp
+                    
+                
+                elif not time.CheckCooldown(request.session.get("cooldown")):
+                   
+                    returnjson["message"] = "Timer is under cooldown"
+                
+            request.session.set_expiry(30000)
+
+            
+            return JsonResponse(returnjson)
+        
+        # Step 2 : Verify OTP
+        elif request_type == "verify_otp":
+            request_otp = details_pack.get("otp")
+            if  str(request_otp) == str(request.session.get("otp")):
+                request.session.pop("otp")
+                request.session["setup"] = "otp_done"
+                returnjson["message"] = "OTP verified successfully."
+                returnjson["status"] = "ok"
+                return JsonResponse(returnjson)
+            else :
+                
+                returnjson["message"] = "OTP mismatch!!!"
+                returnjson["status"] = "failed"
+                return JsonResponse(returnjson)
+            
+        # Step 3 : Set new password
+        elif request_type == "submit_password":
+            password_one = details_pack.get("password_one")
+            password_two = details_pack.get("password_two")
+            if password_one != password_two:
+                returnjson["message"] = "Passwords mismatch" 
+                returnjson["status"] = "failed"
+                return JsonResponse(returnjson)
+            elif password_one == password_two:
+                print("passwords match")
+                if request.session.get("setup") == "otp_done":
+                    username = request.session.get("username")
+                    user = models.User.objects.filter(username=username).first()
+                    if user:
+                        user.set_password(password_one)
+                        user.save()
+                        request.session.pop("setup")
+                        request.session.pop("username")
+                        returnjson["message"] = "Password reset successful."
+                        returnjson["status"] = "ok"
+                        print("Password reset successful")
+                        print(returnjson)
+                        return JsonResponse(returnjson)
+                    else:
+                        print(request.session.get("username","none"))
+                        print("User not found")
+                        returnjson["message"] = "User not found."
+                        returnjson["status"] = "failed"
+                        print(returnjson)
+                        return JsonResponse(returnjson)
+                
+
+        
+    
+def AdminLogout(request):
+    logout(request)
+    return HttpResponse("Logout successful")
+
+
+
+def x(request):
+    return HttpResponseRedirect(request,"dashboard")
+
+
+def profile_pic(request,picname):
+    try :
+        with open(f"myadmin/profiles/pics/{picname}", "rb") as f:
+          return HttpResponse(f.read(), content_type="image/jpeg")
+    except: 
+        with open(f"myadmin/profiles/pics/blank_profile.jpg", "rb") as f:
+      
+          return HttpResponse(f.read(), content_type="image/jpeg")
